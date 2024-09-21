@@ -1,70 +1,91 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Address } from "~~/components/scaffold-eth";
+
+// import { useAccount } from "wagmi";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
+  // const { address: connectedAddress } = useAccount();
+  const [message, setMessage] = useState(""); // State to hold the form input
+  const [loading, setLoading] = useState(false); // Loading state for submission
+  const [success, setSuccess] = useState<string | null>(null); // Success message
+  const [error, setError] = useState<string | null>(null); // Error message
+
+  // Function to handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message) {
+      alert("Please enter a message to submit.");
+      return;
+    }
+
+    setLoading(true); // Set loading to true during the process
+    setError(null); // Clear any previous errors
+    setSuccess(null); // Clear any previous success messages
+
+    try {
+      // Call your IPFS client API here
+      const response = await fetch("/api/ipfs_upload_route", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: message }), // Send the actual message to the backend
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Something went wrong.");
+      }
+
+      const data = await response.json();
+      setSuccess(`Uploaded to IPFS: https://bronze-worried-mackerel-385.mypinata.cloud/ipfs/${data.hash}`); // Display the IPFS hash (CID)
+      setMessage(""); // Clear the message input after successful submission
+    } catch (error: any) {
+      setError(error.message || "Failed to upload to IPFS.");
+    } finally {
+      setLoading(false); // Turn off loading after the request is done
+    }
+  };
 
   return (
-    <>
-      <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col sm:flex-row">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
+    <div className="flex items-center justify-center min-h-screen">
+      <form onSubmit={handleSubmit} className="card bg-base-200 shadow-md p-5 w-96">
+        <h2 className="card-title text-center mb-4">Submit Text</h2>
+
+        {/* Input field for message */}
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text">Your Message</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Type your text"
+            className="input input-bordered"
+            value={message} // Bind input value to state
+            onChange={e => setMessage(e.target.value)} // Update state when input changes
+            disabled={loading} // Disable input when loading
+          />
         </div>
 
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-          </div>
+        {/* Display loading indicator */}
+        {loading && <div className="text-center text-gray-500 mb-4">Uploading to IPFS...</div>}
+
+        {/* Display success message */}
+        {success && <div className="text-center text-green-500 mb-4">{success}</div>}
+
+        {/* Display error message */}
+        {error && <div className="text-center text-red-500 mb-4">{error}</div>}
+
+        {/* Submit button */}
+        <div className="form-control">
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Submitting..." : "Submit"}
+          </button>
         </div>
-      </div>
-    </>
+      </form>
+    </div>
   );
 };
 

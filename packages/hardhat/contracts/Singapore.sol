@@ -8,8 +8,6 @@ contract Singapore {
         address requester;        // Address of the person requesting the service
         uint256 amount;           // Amount of Ether placed in escrow by requester
         string requestDescription;// Description of the task (e.g., "Write cover letter")
-        string flatURL;           // Plain URL to initial job details (for reference)
-        string hashedURL;         // Hashed URL for data verification (optional)
         address worker;           // Address of the person fulfilling the task
         string workerSubmissionURL; // URL to the worker's submitted work
         bool isFulfilled;         // Whether the task has been fulfilled
@@ -59,8 +57,6 @@ contract Singapore {
 			requester: msg.sender,
 			amount: _value,
 			requestDescription: _requestDescription,
-			flatURL: "",
-			hashedURL: "",
 			worker: address(0),
 			workerSubmissionURL: "",
 			isFulfilled: false,
