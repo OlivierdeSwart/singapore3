@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Singapore: {
-      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       abi: [
         {
           anonymous: false,
@@ -96,7 +96,7 @@ const deployedContracts = {
             {
               indexed: false,
               internalType: "string",
-              name: "submissionURL",
+              name: "submissionCID",
               type: "string",
             },
           ],
@@ -173,23 +173,13 @@ const deployedContracts = {
               type: "string",
             },
             {
-              internalType: "string",
-              name: "flatURL",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "hashedURL",
-              type: "string",
-            },
-            {
               internalType: "address",
               name: "worker",
               type: "address",
             },
             {
               internalType: "string",
-              name: "workerSubmissionURL",
+              name: "workerSubmissionCID",
               type: "string",
             },
             {
@@ -215,7 +205,7 @@ const deployedContracts = {
             },
             {
               internalType: "string",
-              name: "_submissionURL",
+              name: "_submissionCID",
               type: "string",
             },
           ],
