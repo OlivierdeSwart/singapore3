@@ -9,7 +9,7 @@ contract Singapore {
         uint256 amount;           // Amount of Ether placed in escrow by requester
         string requestDescription;// Description of the task (e.g., "Write cover letter")
         address worker;           // Address of the person fulfilling the task
-        string workerSubmissionURL; // URL to the worker's submitted work
+        string workerSubmissionCID; // CID to the worker's submitted work (e.g., IPFS CID)
         bool isFulfilled;         // Whether the task has been fulfilled
         bool isApproved;          // Whether the task is approved by the requester or AI
     }
@@ -19,7 +19,7 @@ contract Singapore {
 
     // Events
     event JobCreated(uint256 jobId, address requester, string description, uint256 amount);
-    event JobSubmitted(uint256 jobId, address worker, string submissionURL);
+    event JobSubmitted(uint256 jobId, address worker, string submissionCID);
     event JobApproved(uint256 jobId, address approver);
     event JobRejected(uint256 jobId, address approver);
 
@@ -58,7 +58,7 @@ contract Singapore {
 			amount: _value,
 			requestDescription: _requestDescription,
 			worker: address(0),
-			workerSubmissionURL: "",
+			workerSubmissionCID: "",
 			isFulfilled: false,
 			isApproved: false
 		});
@@ -67,18 +67,18 @@ contract Singapore {
 	}
 	
 	// Function for the worker to submit their work
-	function submitWork(uint256 jobId, string memory _submissionURL)
+	function submitWork(uint256 jobId, string memory _submissionCID)
 		public
 		jobNotFulfilled(jobId)
 	{
 		uint256 adjustedJobId = jobId - 1;  // Adjust jobId to match array index
 
-		// Store the worker's submission URL and address
+		// Store the worker's submission CID and address
 		jobs[adjustedJobId].worker = msg.sender;  // Set the worker's address
-		jobs[adjustedJobId].workerSubmissionURL = _submissionURL;
+		jobs[adjustedJobId].workerSubmissionCID = _submissionCID;
 		jobs[adjustedJobId].isFulfilled = true;
 
-		emit JobSubmitted(jobId, msg.sender, _submissionURL);
+		emit JobSubmitted(jobId, msg.sender, _submissionCID);
 	}
 
 	// Function for the requester to approve the submitted work and release the payment
